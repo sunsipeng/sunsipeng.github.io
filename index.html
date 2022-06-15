@@ -11,8 +11,8 @@
  <body>
   <h1>>Record the Audio</h1>
   
-  <audio controls style='opacity:0'>
-   <source src="horse.ogg" type="audio/webm">
+  <audio controls src='' id='audioDom'>
+   
    您的浏览器不支持 audio 元素。
  </audio>
  </body> 
@@ -90,6 +90,7 @@
      var blob=new Blob([soundBlob], {type : 'audio/webm'});
      var blobUrl = URL.createObjectURL(blob);
      console.log(blobUrl, 'URL');
+     document.getElementById('audioDom').setAttribute('src', blobUrl);
     }
 
     RecordAudio.prototype.convertDataURIToBinary = function (dataURI) {
