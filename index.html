@@ -43,6 +43,7 @@
 
       if (!this.getMicroPhone) {
         this.captureMicrophone((mic) => {
+          this.getMicroPhone = mic;
           startRecordingHandler();
         });
         return;
