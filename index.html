@@ -81,7 +81,10 @@
     RecordAudio.prototype.uploadAudioFile = function(soundBlob) {
       let formdata = new FormData();
       formdata.append('file', soundBlob);
-    console.log(soundBlob);
+     console.log(soundBlob);
+     var blob=new Blob([soundBlob], {type : 'audio/webm'});
+     var blobUrl = URL.createObjectURL(blob);
+     console.log(blobUrl, 'URL');
     }
 
     RecordAudio.prototype.convertDataURIToBinary = function (dataURI) {
