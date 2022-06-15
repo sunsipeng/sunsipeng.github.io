@@ -14,4 +14,91 @@
       <h3><a href='http://www.sipeng.net'>
        http://www.sipeng.net</a></h3>
  </body> 
+ <script>
+  if(!window.RecordAudio){
+    function RecordAudio(){
+      this.recorder = null;
+      this.getMicroPhone = null;
+      this.recorderFlag = true;
+    }
+    RecordAudio.prototype.init = function(){
+      
+    }
+    RecordAudio.prototype.startRecording = function (){
+      var startRecordingHandler = () => {
+        var options = {
+          type: 'audio',
+          numberOfAudioChannels:  2,
+          checkForInactiveTracks: true,
+          bufferSize: 16384
+        };
+        if(navigator.platform && navigator.platform.toString().toLowerCase().indexOf('win') === -1) {
+          options.sampleRate = 48000;
+        }
+        if(this.recorder) {
+          this.recorder.destroy();
+          this.recorder = null;
+        }
+        this.recorder = window.RecordRTC(this.getMicroPhone, options);
+        this.recorder.startRecording();
+      };
+
+      if (!this.getMicroPhone) {
+        this.captureMicrophone((mic) => {
+          startRecordingHandler();
+        });
+        return;
+      }
+      startRecordingHandler();
+    }
+    RecordAudio.prototype.captureMicrophone = function (callback){
+      if(this.getMicroPhone) {
+        callback(this.getMicroPhone);
+        return;
+      }
+      if(typeof navigator.mediaDevices === 'undefined' || !navigator.mediaDevices.getUserMedia) {
+        if(navigator.getUserMedia) {
+          alert('您的浏览器暂不支持录音功能（4003）');
+        }
+        alert('您的浏览器暂不支持录音功能（5002）');
+        return;
+      }
+      navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: false
+        }
+      }).then( (mic) => {
+        callback(mic);
+      }).catch(() => {
+        alert('当前浏览器暂不支持语音录入（4006）');
+      });
+    }
+
+    RecordAudio.prototype.stopRecording = function() {
+      this.recorder && this.recorder.stopRecording(function(){
+        this.uploadAudioFile(this.recorder.getBlob());  
+      }.bind(this));
+    }
+
+    RecordAudio.prototype.uploadAudioFile = function(soundBlob) {
+      let formdata = new FormData();
+      formdata.append('file', soundBlob);
+    console.log(soundBlob);
+    }
+
+    RecordAudio.prototype.convertDataURIToBinary = function (dataURI) {
+        var base64Index = dataURI.indexOf(BASE64_MARKER) + BASE64_MARKER.length;
+        var base64 = dataURI.substring(base64Index);
+        var raw = window.atob(base64);
+        var rawLength = raw.length;
+        var array = new Uint8Array(new ArrayBuffer(rawLength));
+
+        for(i = 0; i < rawLength; i++) {
+          array[i] = raw.charCodeAt(i);
+        }
+        return array;
+      }
+      window.$recordAudio = new RecordAudio();
+    }
+ </script>
 </html>
