@@ -34,7 +34,8 @@
       
     }
     RecordAudio.prototype.startRecording = function (){
-      var startRecordingHandler = () => {
+      var self = this;
+      var startRecordingHandler = function () {
         var options = {
           type: 'audio',
           numberOfAudioChannels:  2,
@@ -46,12 +47,12 @@
         if(navigator.platform && navigator.platform.toString().toLowerCase().indexOf('win') === -1) {
           options.sampleRate = 48000;
         }
-        if(this.recorder) {
-          this.recorder.destroy();
-          this.recorder = null;
+        if(self.recorder) {
+          self.recorder.destroy();
+          self.recorder = null;
         }
-        this.recorder = window.RecordRTC(this.getMicroPhone, options);
-        this.recorder.startRecording();
+        self.recorder = window.RecordRTC(self.getMicroPhone, options);
+        self.recorder.startRecording();
       };
 
       if (!this.getMicroPhone) {
@@ -77,10 +78,10 @@
       }
       navigator.mediaDevices.getUserMedia({
         audio: true
-      }).then( (mic) => {
+      }).then(function (mic) {
         callback(mic);
-      }).catch((err) => {
-       console.log(err);
+      }).catch(function (err) {
+        console.log(err);
         alert('当前浏览器暂不支持语音录入（4006）');
       });;
     }
