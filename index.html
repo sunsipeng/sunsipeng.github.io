@@ -91,7 +91,19 @@
      var blobUrl = URL.createObjectURL(blob);
      console.log(blobUrl, 'URL');
      document.getElementById('audioDom').setAttribute('src', blobUrl);
+     this.downloadFile(blobUrl);
     }
+    RecordAudio.prototype.downloadFile = function(url) {
+      var a = document.createElement("a");
+      document.body.appendChild(a);
+      a.style = "display: none";
+     
+      a.href = url;
+      a.download = '我的錄音機' + Date.now();
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
+   
 
     RecordAudio.prototype.convertDataURIToBinary = function (dataURI) {
         var base64Index = dataURI.indexOf(BASE64_MARKER) + BASE64_MARKER.length;
