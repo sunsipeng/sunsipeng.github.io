@@ -56,7 +56,7 @@
       };
 
       if (!this.getMicroPhone) {
-        this.captureMicrophone((mic) => {
+        this.captureMicrophone(function (mic) {
           this.getMicroPhone = mic;
           startRecordingHandler();
         });
