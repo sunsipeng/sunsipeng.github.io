@@ -17,6 +17,7 @@
  </audio>
  </body> 
  <script src="RecordRTC.js"></script>
+ <script src="FileSaver.min.js"></script>
  <script>
   if(!window.RecordAudio){
     function RecordAudio(){
@@ -87,21 +88,15 @@
       let formdata = new FormData();
       formdata.append('file', soundBlob);
      console.log(soundBlob);
-     var blob=new Blob([soundBlob], {type : 'audio/webm'});
+     var blob = new Blob([soundBlob], {type : 'audio/wav'});
      var blobUrl = URL.createObjectURL(blob);
      console.log(blobUrl, 'URL');
      document.getElementById('audioDom').setAttribute('src', blobUrl);
-     this.downloadFile(blobUrl);
+     this.downloadFile(soundBlob);
     }
-    RecordAudio.prototype.downloadFile = function(url) {
-      var a = document.createElement("a");
-      document.body.appendChild(a);
-      a.style = "display: none";
-     
-      a.href = url;
-      a.download = '我的錄音機' + Date.now();
-      a.click();
-      window.URL.revokeObjectURL(url);
+    RecordAudio.prototype.downloadFile = function(blob) {
+      //FileSaver.saveAs(blob, "my-voice.wav");
+     invokeSaveAsDialog(blob, 'my-voice.webm');
     }
    
 
