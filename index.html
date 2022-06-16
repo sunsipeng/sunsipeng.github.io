@@ -57,7 +57,7 @@
 
       if (!this.getMicroPhone) {
         this.captureMicrophone(function (mic) {
-          this.getMicroPhone = mic;
+          self.getMicroPhone = mic;
           startRecordingHandler();
         });
         return;
@@ -78,12 +78,12 @@
       }
       navigator.mediaDevices.getUserMedia({
         audio: true
-      }).then(function (mic) {
+      }).then( function (mic) {
         callback(mic);
       }).catch(function (err) {
         console.log(err);
         alert('当前浏览器暂不支持语音录入（4006）');
-      });;
+      });
     }
 
     RecordAudio.prototype.stopRecording = function() {
