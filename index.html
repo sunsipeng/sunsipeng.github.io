@@ -34,7 +34,9 @@
           type: 'audio',
           numberOfAudioChannels:  2,
           checkForInactiveTracks: true,
-          bufferSize: 16384
+          bufferSize: 16384,
+          mimeType: 'audio/wav',
+          timeSlice: 4000
         };
         if(navigator.platform && navigator.platform.toString().toLowerCase().indexOf('win') === -1) {
           options.sampleRate = 48000;
@@ -96,7 +98,7 @@
     }
     RecordAudio.prototype.downloadFile = function(blob) {
       //FileSaver.saveAs(blob, "my-voice.wav");
-     invokeSaveAsDialog(blob, 'my-voice.webm');
+     invokeSaveAsDialog(blob, 'my-voice.wav');
     }
    
 
