@@ -1,7 +1,7 @@
 
 <title>蜻蜓录音机</title>
-<script src="/irs/js/RecordRTC.js"></script>
-<script src="/irs/js/jquery.js"></script>
+<script src="js/RecordRTC.js"></script>
+<script src="js/jquery.js"></script>
 <style>
   *{margin:0;padding:0}
 
@@ -122,7 +122,7 @@
     position: absolute;
     left: 0;
     top: 0;
-    background: url('/irs/images/record/record-bg.png');
+    background: url('record/record-bg.png');
     /* filter: blur(10px);
     -webkit-filter: blur(10px);
     -moz-filter: blur(10px);
@@ -144,7 +144,7 @@
     border-radius: 50%;
     box-shadow: 0 0 2px #f5e2e2 inset;
     cursor: pointer;
-    background-image: url('/irs/images/record/record.png');
+    background-image: url('record/record.png');
     background-repeat: no-repeat;
     background-size: 60%;
     background-position: center center;
@@ -157,7 +157,7 @@
     border-radius: 50%;
     box-shadow: 0 0 2px #f5e2e2 inset;
     cursor: pointer;
-    background-image: url('/irs/images/record/stop.png');
+    background-image: url('record/stop.png');
     background-repeat: no-repeat;
     background-size: 60%;
     background-position: center center;
@@ -172,7 +172,7 @@
     height: 40px;
     border-radius: 100%;
     cursor: pointer;
-    background-image: url('/irs/images/record/pause.png');
+    background-image: url('record/pause.png');
     background-repeat: no-repeat;
     background-size: 60%;
     background-position: center center;
@@ -280,8 +280,8 @@
       <div class="audio-container">
         <div class="list">
           <audio src="" id="audiodom"></audio>
-          <img src="/irs/images/record/play_fill.png" alt="" id="play_fill" />
-          <img src="/irs/images/record/pause-button.png" alt="" id="pause_button" />
+          <img src="record/play_fill.png" alt="" id="play_fill" />
+          <img src="record/pause-button.png" alt="" id="pause_button" />
           <input type="text" class="audio-name"/>
         </div>
         <div class="download">下载</div>
@@ -290,7 +290,7 @@
       <div class="tips">温馨提示: 在录制过程中, 不可关闭此页面</div>
     </div>
 </div>
-<script src="/admin/assets/js/date-time/moment.js"></script>
+<script src="js/moment.js"></script>
 <script>
    if(!window.RecordAudio){
       function RecordAudio(){
