@@ -1,126 +1,518 @@
-<!DOCTYPE HTML>
-<html>
- <head>
-  <title>recording the audio</title>
-  <meta name="Generator" content="EditPlus">  
-  <meta name="keywords" content="" />
-  <meta name="description" content="http://sipeng.net/" />
 
- </head>
+<title>蜻蜓录音机</title>
+<script src="/irs/js/RecordRTC.js"></script>
+<script src="/irs/js/jquery.js"></script>
+<style>
+  *{margin:0;padding:0}
 
- <body>
-  <h1>>Record the Audio</h1>
-  
-  <br />
-  <button onclick='window.$recordAudio.startRecording()'>start recording</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <button onclick='window.$recordAudio.stopRecording()'>stop recording</button>
-  <br />
-  
-  <audio controls src='' id='audioDom'>
-   
-   您的浏览器不支持 audio 元素。
- </audio>
- </body> 
- <script src="RecordRTC.js"></script>
- <script src="FileSaver.min.js"></script>
- <script>
-  if(!window.RecordAudio){
-    function RecordAudio(){
-      this.recorder = null;
-      this.getMicroPhone = null;
-      this.recorderFlag = true;
+    /* 动画 */
+    :root {
+          --animate-duration: 1s;
+          --animate-delay: 1s;
+          --animate-repeat: 1
     }
-    RecordAudio.prototype.init = function(){
-      
-    }
-    RecordAudio.prototype.startRecording = function (){
-      var self = this;
-      var startRecordingHandler = function () {
-        var options = {
-          type: 'audio',
-          numberOfAudioChannels:  2,
-          checkForInactiveTracks: true,
-          bufferSize: 16384,
-          mimeType: 'audio/wav',
-          timeSlice: 4000
-        };
-        if(navigator.platform && navigator.platform.toString().toLowerCase().indexOf('win') === -1) {
-          options.sampleRate = 48000;
-        }
-        if(self.recorder) {
-          self.recorder.destroy();
-          self.recorder = null;
-        }
-        self.recorder = window.RecordRTC(self.getMicroPhone, options);
-        self.recorder.startRecording();
-      };
 
-      if (!this.getMicroPhone) {
-        this.captureMicrophone(function (mic) {
-          self.getMicroPhone = mic;
-          startRecordingHandler();
+    .animate__animated.animate__infinite {
+        -webkit-animation-iteration-count: infinite;
+        animation-iteration-count: infinite
+    }
+
+    .animate__animated {
+          -webkit-animation-duration: 1s;
+          animation-duration: 1s;
+          -webkit-animation-duration: var(--animate-duration);
+          animation-duration: var(--animate-duration);
+          -webkit-animation-fill-mode: both;
+          animation-fill-mode: both
+    }
+
+    .animate__heartBeat {
+        -webkit-animation-duration: 1.3s;
+        animation-duration: 1.3s;
+        -webkit-animation-duration: calc(var(--animate-duration)*1.3);
+        animation-duration: calc(var(--animate-duration)*1.3);
+        -webkit-animation-name: heartBeat;
+        animation-name: heartBeat;
+        -webkit-animation-timing-function: ease-in-out;
+        animation-timing-function: ease-in-out
+    }
+
+
+    @media (prefers-reduced-motion:reduce),print {
+        .animate__animated {
+            -webkit-animation-duration: 1ms!important;
+            animation-duration: 1ms!important;
+            -webkit-animation-iteration-count: 1!important;
+            animation-iteration-count: 1!important;
+            -webkit-transition-duration: 1ms!important;
+            transition-duration: 1ms!important
+        }
+
+        .animate__animated[class*=Out] {
+            opacity: 0
+        }
+    }
+
+    @-webkit-keyframes heartBeat {
+      0% {
+          -webkit-transform: scale(1);
+          transform: scale(1)
+      }
+
+      14% {
+          -webkit-transform: scale(1.3);
+          transform: scale(1.3)
+      }
+
+      28% {
+          -webkit-transform: scale(1);
+          transform: scale(1)
+      }
+
+      42% {
+          -webkit-transform: scale(1.3);
+          transform: scale(1.3)
+      }
+
+      70% {
+          -webkit-transform: scale(1);
+          transform: scale(1)
+      }
+  }
+
+  @keyframes heartBeat {
+      0% {
+          -webkit-transform: scale(1);
+          transform: scale(1)
+      }
+
+      14% {
+          -webkit-transform: scale(1.3);
+          transform: scale(1.3)
+      }
+
+      28% {
+          -webkit-transform: scale(1);
+          transform: scale(1)
+      }
+
+      42% {
+          -webkit-transform: scale(1.3);
+          transform: scale(1.3)
+      }
+
+      70% {
+          -webkit-transform: scale(1);
+          transform: scale(1)
+      }
+  }
+
+
+  .recording-main-container{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .recording-main-container::after{
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: url('/irs/images/record/record-bg.png');
+    /* filter: blur(10px);
+    -webkit-filter: blur(10px);
+    -moz-filter: blur(10px);
+    -ms-filter: blur(10px); */
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-size: 100%;
+  }
+  .record-content{
+    width: 300px;
+    height: 300px;
+    position: relative;
+  }
+  .recording-button{
+    width: 80px;
+    height: 80px;
+    background: #3A7EF6;
+    border-radius: 50%;
+    box-shadow: 0 0 2px #f5e2e2 inset;
+    cursor: pointer;
+    background-image: url('/irs/images/record/record.png');
+    background-repeat: no-repeat;
+    background-size: 60%;
+    background-position: center center;
+    margin: 0 auto;
+  }
+  .stop-button{
+    width: 80px;
+    height: 80px;
+    background: #3A7EF6;
+    border-radius: 50%;
+    box-shadow: 0 0 2px #f5e2e2 inset;
+    cursor: pointer;
+    background-image: url('/irs/images/record/stop.png');
+    background-repeat: no-repeat;
+    background-size: 60%;
+    background-position: center center;
+    margin: 0 auto;
+    display: none;
+  }
+  .recording-button:active{
+    transform: scale(.8);
+  }
+  .pause{
+    width: 40px;
+    height: 40px;
+    border-radius: 100%;
+    cursor: pointer;
+    background-image: url('/irs/images/record/pause.png');
+    background-repeat: no-repeat;
+    background-size: 60%;
+    background-position: center center;
+    margin: 30px auto;
+    display: none;
+  }
+  /* .pause:hover{
+    background-color: rgba(247, 247, 247, .1);
+  } */
+  .pause-actived{
+    background-color: #3A7EF6;
+  }
+  .timer{
+    color: #333;
+    font-size: 30px;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  audio{
+    width: 221px;
+    margin-top: 30px;
+    display: inline-block;
+  }
+  .download{
+    width: 65px;
+    height: 29px;
+    background: rgba(61, 124, 244, 1);
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 29px;
+    color: #FFFFFF;
+    text-align: center;
+    cursor: pointer;
+    display: inline-block;
+    margin: 10px auto;
+    position: absolute;
+    right: 0;
+    top: 38px;
+  }
+  .audio-container{
+    width: 100%;
+    height: 60px;
+    position: relative;
+    display: none;
+  }
+  .list{
+    width:74%;
+    height: 45px;
+    background: #fff;
+    box-sizing: border-box;
+    position: absolute;
+    top: 40px;
+    border-radius: 2px;
+  }
+  .list img{
+    padding-top: 10px;
+    width: 26px;
+    cursor: pointer;
+    padding-left: 6px;
+  }
+  #pause_button{
+    display: none;
+  }
+  .audio-name{
+    width: 180px;
+    height: 90%;
+    outline: none;
+    margin-top: 3px;
+    float: right;
+    margin-right: 5px;
+    -webkit-appearance: none;
+    background-color: #fff;
+    background-image: none;
+    border-radius: 4px;
+    border: 1px solid #dcdfe6;
+    box-sizing: border-box;
+    color: #606266;
+    display: inline-block;
+    font-size: inherit;
+    height: 40px;
+    line-height: 40px;
+    outline: none;
+    padding: 0 15px;
+  }
+  .tips{
+    color: #666;
+    margin-top: 30px;
+  }
+  .main-title{
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 20px;
+  }
+</style>
+<script>window.onbeforeunload = function() { return "关闭录音页面将造成当前录音丢失，您确定关闭吗？"; }</script>
+<div class="recording-main-container">
+    <div class="record-content">
+      <div class="main-title"><{$userDetail['title']}></div>
+      <div class="timer" id="timer">00:00:00</div>
+      <div class="recording-button" id="recordingbutton"></div>
+      <div class="stop-button animate__animated animate__heartBeat animate__infinite" id="stopbutton"></div>
+      <div class="pause" id="pausebutton"></div>
+      <div class="audio-container">
+        <div class="list">
+          <audio src="" id="audiodom"></audio>
+          <img src="/irs/images/record/play_fill.png" alt="" id="play_fill" />
+          <img src="/irs/images/record/pause-button.png" alt="" id="pause_button" />
+          <input type="text" class="audio-name"/>
+        </div>
+        <div class="download">下载</div>
+      </div>
+
+      <div class="tips">温馨提示: 在录制过程中, 不可关闭此页面</div>
+    </div>
+</div>
+<script src="/admin/assets/js/date-time/moment.js"></script>
+<script>
+   if(!window.RecordAudio){
+      function RecordAudio(){
+        this.recorder = null;
+        this.getMicroPhone = null;
+        this.recorderFlag = true;
+        this.timer = null;
+        this.hours = 0;
+        this.minutes = 0;
+        this.seconds = 0;
+        this.soundBlob = null;
+        this.fileName = '';
+        this.paused = false;
+        this.audioFormat = 'audio/webm';
+      }
+      RecordAudio.prototype.$ = function(id){
+        return document.getElementById(id)
+      }
+      RecordAudio.prototype.startTimer = function(){
+        this.timer = setInterval(function(){
+          this.seconds ++;
+          var time = '';
+          if(this.seconds > 59){
+            this.seconds = 0;
+            this.minutes ++;
+          }
+          if(this.minutes > 59){
+            this.minutes = 0;
+            this.seconds = 0;
+            this.hours ++;
+          }
+          this.timeRender();
+        }.bind(this), 1e3);
+      }
+      RecordAudio.prototype.timeRender = function(){
+        var timeString = `${this.hours < 10 ? `0${this.hours}` : this.hours}:${this.minutes < 10 ? `0${this.minutes}` : this.minutes}:${this.seconds < 10 ? `0${this.seconds}` : this.seconds}`;
+        this.$('timer').innerHTML = timeString;
+      }
+      RecordAudio.prototype.endTimer = function(){
+        this.hours = this.minutes = this.seconds = 0;
+        this.timeRender();
+        clearInterval(this.timer);
+      }
+      RecordAudio.prototype.init = function(id){
+        var self = this;
+        this.$('recordingbutton').onclick = function(){                
+          this.startRecording();
+        }.bind(this);
+        this.$('pausebutton').onclick = function(){
+          if(this.recorderFlag){
+            this.recorderFlag = false;
+            this.$('pausebutton').classList.remove('pause-actived');
+            this.$('stopbutton').classList.add('animate__heartBeat');
+            this.$('stopbutton').classList.add('animate__infinite');
+            this.startTimer();
+          } else {
+            this.recorderFlag = true;
+            this.$('pausebutton').classList.add('pause-actived');
+            this.$('stopbutton').classList.remove('animate__heartBeat');
+            this.$('stopbutton').classList.remove('animate__infinite');
+            clearInterval(this.timer);
+          }
+          
+          this.pauseRecording();
+        }.bind(this)
+
+        this.$('stopbutton').onclick = function(){
+          this.recorderFlag = false;
+          var prov = "<{$userDetail['prov']}>"
+          var fileName = (prov ? prov : '系统录音') + '-' + moment().format('YYYY_MM_DD_HH:mm:ss');
+          this.endTimer();
+          this.$('stopbutton').style.display = 'none';
+          this.$('pausebutton').style.display = 'none';
+          this.$('recordingbutton').style.display ='block';
+          this.stopRecording();
+          $('.audio-container').show();
+          $('.audio-name').val(fileName);
+          this.fileName = fileName;
+          this.recorderFlag = true;
+          this.$('pausebutton').classList.add('pause-actived');
+          this.$('stopbutton').classList.remove('animate__heartBeat');
+          this.$('stopbutton').classList.remove('animate__infinite');
+        }.bind(this);
+        $('.download').click(function(){
+          this.downloadFile(this.soundBlob);
+        }.bind(this));
+        $('.audio-name').blur(function(){
+          if($(this).val() == ''){
+            return alert('名称不能为空');
+          }
+          self.fileName = $(this).val();
         });
-        return;
+
+        $('#play_fill').click(function(){
+          self.$('audiodom').play();
+          $('#pause_button').show();
+          $('#play_fill').hide();
+        });
+
+        $('#pause_button').click(function(){
+          self.$('audiodom').pause();
+          $('#play_fill').show();
+          $('#pause_button').hide();
+        });
+
+        self.$('audiodom').onended = function() {
+          $('#play_fill').show();
+          $('#pause_button').hide();
+        };
       }
-      startRecordingHandler();
-    }
-    RecordAudio.prototype.captureMicrophone = function (callback){
-      if(this.getMicroPhone) {
-        callback(this.getMicroPhone);
-        return;
+      RecordAudio.prototype.pauseRecording = function(){
+        if(this.paused){
+          this.recorder && this.recorder.resumeRecording();
+          this.paused = false;
+        } else {
+          this.recorder && this.recorder.pauseRecording();
+          this.paused = true;
+        }  
       }
-      if(typeof navigator.mediaDevices === 'undefined' || !navigator.mediaDevices.getUserMedia) {
-        if(navigator.getUserMedia) {
-          alert('您的浏览器暂不支持录音功能（4003）');
+      RecordAudio.prototype.startRecording = function (){
+        var self = this;
+        var startRecordingHandler = function () {
+          var options = {
+            type: 'audio',
+            // numberOfAudioChannels:  1,
+            // checkForInactiveTracks: true,
+            // bufferSize: 16384,
+            recorderType: StereoAudioRecorder,
+            numberOfAudioChannels: 2
+            // timeSlice: 4000
+            // bitsPerSecond: 96000
+          };
+          if(self.isMac()) {
+            options.sampleRate = 48000;
+            // options = {
+            //   sampleRate: 48000,
+            //   type: 'audio',
+            //   numberOfAudioChannels:  2,
+            //   checkForInactiveTracks: true,
+            //   bufferSize: 16384,
+            //   mimeType: 'audio/mp3',
+            //   timeSlice: 4000
+            // }
+          }
+          if(self.recorder) {
+            self.recorder.destroy();
+            self.recorder = null;
+          }
+          self.recorder = window.RecordRTC(self.getMicroPhone, options);
+          self.recorder.startRecording();
+
+          self.recorderFlag = false;
+          self.$('stopbutton').style.display = 'block';
+          self.$('pausebutton').style.display = 'block';
+          self.$('recordingbutton').style.display ='none';
+
+          $('#stopbutton').removeClass('animate__infinite').removeClass('animate__heartBeat');
+          $('#stopbutton').addClass('animate__infinite').addClass('animate__heartBeat');
+          $('#pausebutton').removeClass('pause-actived');
+          self.startTimer();
+        };
+
+        if (!this.getMicroPhone) {
+          this.captureMicrophone(function (mic) {
+            self.getMicroPhone = mic;
+            startRecordingHandler();
+          });
+          return;
         }
-        alert('您的浏览器暂不支持录音功能（5002）');
-        return;
+        startRecordingHandler();
       }
-      navigator.mediaDevices.getUserMedia({
-        audio: true
-      }).then( function (mic) {
-        callback(mic);
-      }).catch(function (err) {
-        console.log(err);
-        alert('当前浏览器暂不支持语音录入（4006）');
-      });
-    }
-
-    RecordAudio.prototype.stopRecording = function() {
-      this.recorder && this.recorder.stopRecording(function(){
-        this.uploadAudioFile(this.recorder.getBlob());  
-      }.bind(this));
-    }
-
-    RecordAudio.prototype.uploadAudioFile = function(soundBlob) {
-      let formdata = new FormData();
-      formdata.append('file', soundBlob);
-     console.log(soundBlob);
-     var blob = new Blob([soundBlob], {type : 'audio/wav'});
-     var blobUrl = URL.createObjectURL(blob);
-     console.log(blobUrl, 'URL');
-     document.getElementById('audioDom').setAttribute('src', blobUrl);
-     this.downloadFile(soundBlob);
-    }
-    RecordAudio.prototype.downloadFile = function(blob) {
-      //FileSaver.saveAs(blob, "my-voice.wav");
-     invokeSaveAsDialog(blob, 'my-voice.wav');
-    }
-   
-
-    RecordAudio.prototype.convertDataURIToBinary = function (dataURI) {
-        var base64Index = dataURI.indexOf(BASE64_MARKER) + BASE64_MARKER.length;
-        var base64 = dataURI.substring(base64Index);
-        var raw = window.atob(base64);
-        var rawLength = raw.length;
-        var array = new Uint8Array(new ArrayBuffer(rawLength));
-
-        for(i = 0; i < rawLength; i++) {
-          array[i] = raw.charCodeAt(i);
+      RecordAudio.prototype.captureMicrophone = function (callback){
+        if(this.getMicroPhone) {
+          callback(this.getMicroPhone);
+          return;
         }
-        return array;
+        if(typeof navigator.mediaDevices === 'undefined' || !navigator.mediaDevices.getUserMedia) {
+          if(navigator.getUserMedia) {
+            alert('您的浏览器暂不支持录音功能（4003）');
+          }
+          alert('您的浏览器暂不支持录音功能（5002）');
+          return;
+        }
+        navigator.mediaDevices.getUserMedia({
+          audio: true
+        }).then( function (mic) {
+          callback(mic);
+        }).catch(function (err) {
+          console.log(err);
+          alert('当前浏览器暂不支持语音录入（4006）');
+        });
       }
+
+      RecordAudio.prototype.stopRecording = function() {
+        this.recorder && this.recorder.stopRecording(function(){
+          this.uploadAudioFile(this.recorder.getBlob());  
+        }.bind(this));
+      }
+
+      RecordAudio.prototype.uploadAudioFile = function(soundBlob) {
+        var blob = new Blob([soundBlob], {type :  this.audioFormat});
+        var blobUrl = URL.createObjectURL(blob);
+        var audioDom = document.getElementById('audiodom');
+        audioDom.setAttribute('src', blobUrl);
+        // this.downloadFile(soundBlob);
+        this.soundBlob = soundBlob;
+      }
+      RecordAudio.prototype.downloadFile = function(blob) {
+        
+        var file = new File([blob], this.fileName, {
+            type: this.audioFormat
+        });
+
+        invokeSaveAsDialog(file, this.fileName);
+        // invokeSaveAsDialog(blob, this.fileName + '.wav');
+      }
+
+      RecordAudio.prototype.isMac = function(){
+        return navigator.platform && navigator.platform.toString().toLowerCase().indexOf('win') === -1;
+      }
+    
       window.$recordAudio = new RecordAudio();
+      window.$recordAudio.init();
     }
- </script>
-</html>
+</script>
